@@ -41,6 +41,7 @@ def help():
     print("输入about查看关于")
     print("输入setting修改设置")
     print("输入reload重新加载设置")
+    print("输入clear重置")
     print("输入exit退出")
 
 
@@ -112,6 +113,10 @@ def check(text, robot):
         reload(robot)
         return 1
     elif text == "exit":
+        return -1
+    elif text == "clear":
+        os.remove("illegalwords.txt")
+        os.remove("settings.json")
         return -1
     else:
         return 0

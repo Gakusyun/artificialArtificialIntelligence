@@ -36,6 +36,14 @@ class Robot:
             )
 
 
+def help():
+    print("输入help查看帮助")
+    print("输入about查看关于")
+    print("输入setting修改设置")
+    print("输入reload重新加载设置")
+    print("输入exit退出")
+
+
 def get_settings():
     name = input("请输入智能助理的名称：")
     relation = input("请输入" + name + "是你的什么:")
@@ -56,6 +64,27 @@ def r18on(robot):
         f.close()
 
 
+def r18off(robot):
+    robot.r18 = False
+    settings = {
+        "name": robot.name,
+        "relation": robot.relation,
+        "r18": False,
+        "your_name": robot.your_name,
+    }
+    with open("./settings.json", "w", encoding="utf-8") as f:
+        json.dump(settings, f, ensure_ascii=False)
+        f.close()
+
+
+def setting(robot):
+    settings = get_settings()
+    robot.refresh(settings)
+    with open("./settings.json", "w", encoding="utf-8") as f:
+        json.dump(settings, f, ensure_ascii=False)
+        f.close()
+
+
 def reload(robot):
     with open("settings.json", "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -63,30 +92,47 @@ def reload(robot):
         robot.refresh(data)
 
 
-def greet(text):
-    return text.replace("你好", "robot.your_name" + "好")
-
-
-def personalize(text, robot):
-    if text.find(robot.name) == -1:
-        return text.replace("我", "robot.your_name").replace("你", "robot.name")
+def check(text, robot):
+    if text == "about":
+        robot.about()
+        return 1
+    elif text == "help":
+        help()
+        return 1
+    elif text == "r18on":
+        r18on(robot)
+        return 1
+    elif text == "r18off":
+        r18off(robot)
+        return 1
+    elif text == "setting":
+        setting(robot)
+        return 1
+    elif text == "reload":
+        reload(robot)
+        return 1
+    elif text == "exit":
+        return -1
     else:
-        return (
+        return 0
+
+
+def change(text, robot):
+    text = text.replace("你好", "robot.your_name" + "好")
+    text = text.replace("吗", "").replace("？", "！")
+    if text.find(robot.name) == -1:
+        text = text.replace("我", "robot.your_name").replace("你", "robot.name")
+    else:
+        text = (
             text.replace("我", "robot.name")
             .replace("你", "")
             .replace(robot.name, "robot.your_name")
             .replace(robot.your_name, "robot.name")
         )
-
-
-def remove_question(text):
-    return text.replace("吗", "").replace("？", "！")
-
-
-def name_change(text, robot):
-    return text.replace("robot.name", robot.name).replace(
+    text = text.replace("robot.name", robot.name).replace(
         "robot.your_name", robot.your_name
     )
+    return text
 
 
 def main():
@@ -104,23 +150,14 @@ def main():
         robot.refresh(settings)
     while True:
         text = input(">>")
-        if text == "about":
-            robot.about()
-            continue
-        if text == "r18on":
-            r18on(robot)
-            continue
-        if text == "reload":
-            reload(robot)
-            continue
-        if text == "exit":
+        flag = check(text, robot)
+        if flag == -1:
             break
-        text = greet(text)
-        text = personalize(text, robot)
-        text = remove_question(text)
-        text = name_change(text, robot)
+        elif flag == 1:
+            continue
+        text = change(text, robot)
         if not robot.r18:
-            for word in ["做爱", "性奴", "自慰", "高潮", "撸管", "肏"]:
+            for word in ["做爱", "性奴", "自慰", "高潮", "撸管", "肏", "doi"]:
                 if text.find(word) != -1:
                     print(robot.name + ": 这话我绝对不会说！")
                     is_r18 = True

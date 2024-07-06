@@ -1,4 +1,4 @@
-import json, os
+import json, os, urllib.request
 
 
 class Robot:
@@ -137,6 +137,23 @@ def change(text, robot):
 
 def main():
     robot = Robot()
+    if os.path.isfile("./illegalwords.txt"):
+        with open("illegalwords.txt", "r", encoding="utf-8") as file:
+            # 读取所有行到列表中
+            lines = file.readlines()
+            file.close()
+    else:
+        # 下载非法词库
+        url = "https://raw.githubusercontent.com/konsheng/Sensitive-lexicon/main/Vocabulary/%E8%89%B2%E6%83%85%E8%AF%8D%E5%BA%93.txt"
+        try:
+            urllib.request.urlretrieve(url, "illegalwords.txt")
+            with open("illegalwords.txt", "r", encoding="utf-8") as file:
+                # 读取所有行到列表中
+                lines = file.readlines()
+                file.close()
+        except:
+            print("下载失败")
+            lines = ["做爱", "性奴", "自慰", "高潮", "撸管", "肏", "doi"]
     if os.path.isfile("./settings.json"):
         with open("settings.json", "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -157,10 +174,12 @@ def main():
             continue
         text = change(text, robot)
         if not robot.r18:
-            for word in ["做爱", "性奴", "自慰", "高潮", "撸管", "肏", "doi"]:
-                if text.find(word) != -1:
+            is_r18 = False
+            for word in lines:
+                if text.find(word.strip()) != -1:
                     print(robot.name + ": 这话我绝对不会说！")
                     is_r18 = True
+                    break
             if is_r18:
                 is_r18 = False
                 continue

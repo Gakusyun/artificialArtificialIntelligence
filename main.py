@@ -124,6 +124,7 @@ def check(text, robot):
 
 def change(text, robot):
     text = text.replace("你好", "robot.your_name" + "好")
+    text = text.replace("怎么样", "挺好的")
     text = text.replace("吗", "").replace("？", "！")
     if text.find(robot.name) == -1:
         text = text.replace("我", "robot.your_name").replace("你", "robot.name")
@@ -158,7 +159,7 @@ def main():
                 file.close()
         except:
             print("下载失败")
-            lines = ["做爱", "性奴", "自慰", "高潮", "撸管", "肏", "doi"]
+            lines = []
     if os.path.isfile("./settings.json"):
         with open("settings.json", "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -182,7 +183,7 @@ def main():
             is_r18 = False
             for word in lines:
                 if text.find(word.strip()) != -1:
-                    print(robot.name + ": 这话我绝对不会说！")
+                    print(robot.name + ": 这种话我绝对不会说！")
                     is_r18 = True
                     break
             if is_r18:
